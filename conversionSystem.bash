@@ -2,8 +2,6 @@
 #Menu Driven Conversion System
 #temperature   #length   #area
 
-echo "------------------Unit Converter-----------------"
-
 meter_convert() {
       case $1 in
               1)
@@ -75,6 +73,41 @@ meter_convert() {
 esac
 }
 
+area_conv(){
+    case $1 in
+	    1)
+		    con_fact=$(echo "1" | bc)
+		    units="Square meter"
+		    sym="m^2"
+		    ;;
+           2)
+		   con_fact=$(echo "0.01" | bc)
+		   units="Square decimeter"
+		   sym="dm^2"
+		   ;;
+           3)
+		   con_fact=$(echo "0.0001" | bc)
+		   units="Square centimeter"
+		   sym="cm^2"
+		   ;;
+           4)
+		   con_fact=$(echo "1000000" | bc)
+		   units="Square kilometer"
+		   sym="km^2"
+		   ;;
+           5)
+		   con_fact=$(echo "0.000001" | bc)
+		   units="Square millimeter"
+		   sym="mm^2"
+		   ;;
+           6)
+		   con_fact=$(echo "10000" | bc)
+		   units="Hectare"
+		   sym="ha"
+		   ;;
+   esac
+}
+
 
 converter() {
       case $1 in
@@ -94,7 +127,7 @@ converter() {
 
 			      elif [ $totemp = 3 ]; then
 				      echo "Celsius to Fareheit"
-				      conv=$(echo $temp * 1.8 + 32 | bc)
+				      conv=$(echo "($temp * 1.8) + 32" | bc)
 				      echo "Temperature in Celsius is: " $temp " C"
 				      echo "Temperature in Farenheit is: " $conv " F"
 				      
@@ -107,7 +140,7 @@ converter() {
 			      read -p "Enter temperature in Kelvin: " temp
 			      if [ $totemp = 1 ]; then
 				      echo "Kelvin to Celsius" 
-				      conv=$(echo $temp - 273.15 | bc)
+				      conv=$(echo "$temp - 273.15" | bc)
 				      echo "Temperature in Kelvin is: " $temp " K"
 				      echo "Temperatur in Celsius is: " $conv " C"
 			      elif [ $totemp = 3 ]; then
@@ -159,11 +192,43 @@ converter() {
 		      res=$(echo " scale=10; $to_meter/$reverse_fact" | bc)
 		      echo "The given lenth in $fromunits is = $len $fromsym"
 		      echo "Length in $tounits is = $res $tosym"
+                      ;;
+
+		3)
+			echo "-----------Area------------"
+			echo -e  "1.  Square meter (m^2)\n2. Square decimeter (dm^2)\n3. Square centimeter (cm^2)\n4. Square kilometer (km^2)\n5. Square millimeter (mm^2)\n6. Hectare"
+  
+		      read -p "Conversion From: " from_area
+		      read -p "Conversion to: " to_area
+
+                      area_conv $from_area
+		      meter_fact=$(echo $con_fact | bc)
+		      fromUnits=$units
+		      fromSym=$sym
+		      read -p "Enter area in $fromUnits: " area
+		      to_meter2=$(echo "$meter_fact*$area" | bc)
+
+		      area_conv $to_area
+		      reverse_fact=$(echo $con_fact | bc)
+		      toUnits=$units
+		      toSym=$sym
+		      res=$(echo "scale=10; $to_meter2/$reverse_fact" | bc)
+		      echo "The given area in $fromUnits is = $area $fromSym"
+		      echo "Area in $toUnits is = $res $toSym"
+      		       ;;
+
+	      4)
+                       exit
+                       ;;		       
+
+	      *)
+	              echo "Invalid Option"	      
                       
            esac
 		     }
-
-echo -e "1. Temperature\n2. Length\n3.Area"
+while [ 1 ]; do
+echo "------------------Unit Converter-----------------"
+echo -e "1. Temperature\n2. Length\n3. Area\n4. Exit"
 read -p "Enter your choice: " choice
-
 converter $choice
+done
